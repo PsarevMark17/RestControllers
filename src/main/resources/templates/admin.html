@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель администратора</title>
+</head>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+        text-align: left;
+    }
+    .button {
+        position:absolute;
+        top:15px;
+        right:15px;
+    }
+    .button2 {
+        position:absolute;
+        top:15px;
+        left:15px;
+    }
+</style>
+<body>
+<div style="display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     text-align: center;
+     min-height: 100vh;">
+    <button sec:authorize="hasRole('ROLE_ADMIN')" class="button2" onclick="location.href = '/user'">Данные пользователя</button>
+    <button class="button" onclick="location.href = '/logout'">Выйти</button>
+    <form method="POST" th:action="@{/admin}" th:object="${newUser}" id="Create">
+        <form></form>
+        <table>
+            <tr>
+                <th>АйДи</th>
+                <th>Адрес электронной почты</th>
+                <th>Пароль</th>
+                <th>Фамилия</th>
+                <th>Имя</th>
+                <th>Отчество</th>
+                <th>Дата рождения</th>
+                <th>Роли</th>
+                <th>Обновить</th>
+                <th>Удалить</th>
+            </tr>
+            <th:block th:each="user : ${users}">
+                <tr>
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.username}"></td>
+                    <td>********</td>
+                    <td th:text="${user.surname}"></td>
+                    <td th:text="${user.name}"></td>
+                    <td th:text="${user.patronymic}"></td>
+                    <td th:text="${user.birthDate}"></td>
+                    <td th:text="${users_roles[user.id - 1]}"></td>
+                    <td>
+                        <button th:onclick="|location.href='@{/admin/update(id=${user.id})}'|" type="button">Обновить
+                        </button>
+                    </td>
+                    <td>
+                        <form method="POST" th:action="@{/admin/delete}" th:id="${user.id}">
+                            <input th:form="${user.id}" type="hidden" name="deleteId" th:value="${user.id}"/>
+                            <input th:form="${user.id}" type="submit" value="Удалить"/>
+                        </form>
+                    </td>
+                </tr>
+            </th:block>
+            <tr>
+                <td><input form="Create" type="submit" value="Добавить"/></td>
+                <td><label for="username"></label><input id="username" form="Create"
+                                                         placeholder="Адрес электронной почты" type="text"
+                                                         th:field="*{username}" autofocus required/></td>
+                <td><label for="password"></label><input id="password" form="Create" placeholder="Пароль" type="password"
+                                                         th:field="*{password}" required/></td>
+                <td><label for="surname"></label><input id="surname" form="Create" placeholder="Фамилия" type="text"
+                                                        th:field="*{surname}" required/></td>
+                <td><label for="name"></label><input id="name" form="Create" placeholder="Имя" type="text"
+                                                     th:field="*{name}" required/></td>
+                <td><label for="patronymic"></label><input id="patronymic" form="Create" placeholder="Отчество"
+                                                           type="text" th:field="*{patronymic}"/></td>
+                <td><label for="birthDate"></label><input id="birthDate" form="Create" placeholder="Дата рождения"
+                                                          type="date" th:field="*{birthDate}" required></td>
+                <td><label for="authorities"></label><input id="authorities" form="Create" type="checkbox" name="authorities"
+                                                            th:each="role : ${roles}"
+                                                            th:text="${role.name}"
+                                                            th:value="${role.name}"
+                                                            th:field="*{authorities}"/></td>
+                <td colspan="2">Теперь с защитой!</td>
+            </tr>
+        </table>
+        <br/>
+        <div style="color: red;" th:if="${#fields.hasErrors()}" th:errors="*"></div>
+    </form>
+</div>
+</body>
+</html>

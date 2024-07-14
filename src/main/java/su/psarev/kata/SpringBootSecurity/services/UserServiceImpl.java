@@ -10,6 +10,7 @@ import su.psarev.kata.SpringBootSecurity.entities.User;
 import su.psarev.kata.SpringBootSecurity.repositories.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -60,7 +61,11 @@ public class UserServiceImpl implements UserDetailsService {
     @Transactional
     public void updateUserById(Long id, User user) {
         user.setId(id);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (Objects.equals(user.getPassword(), "Z5F7VnqXxNgeBtdkWsX8sm9bhBmVC9ryH2Pd3y8uQDGyWJtTd3VjfGqT57aKsdkZJXGBCBuXBCRuxVk79wA3MRXJCsfTqDAxTMHdtrxv5NfMss6ft34R8DQJK82YDND5GmV3fPYyVRxUntJQ6ewk4cFW7Ew5dnxnmpHcEjz9tf3x59vJrx9mas6S8YJ5B2TBgNwDpwSzzMesRy2baaZ5pwMp65Sg3Nk7Ttjw8nFJMWsHw5bY9bkwMfBmdWtdzmbq")) {
+            userRepository.getPasswordById(id).ifPresent(user::setPassword);
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userRepository.save(user);
     }
 

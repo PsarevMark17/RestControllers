@@ -91,7 +91,10 @@ public class MainController {
     }
 
     @PostMapping("/admin/update")
-    public String update(@RequestParam("id") Long id, @ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
+    public String update(@RequestParam("id") Long id, @ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
+        if (user.getPassword().isEmpty()) {
+            user.setPassword("Z5F7VnqXxNgeBtdkWsX8sm9bhBmVC9ryH2Pd3y8uQDGyWJtTd3VjfGqT57aKsdkZJXGBCBuXBCRuxVk79wA3MRXJCsfTqDAxTMHdtrxv5NfMss6ft34R8DQJK82YDND5GmV3fPYyVRxUntJQ6ewk4cFW7Ew5dnxnmpHcEjz9tf3x59vJrx9mas6S8YJ5B2TBgNwDpwSzzMesRy2baaZ5pwMp65Sg3Nk7Ttjw8nFJMWsHw5bY9bkwMfBmdWtdzmbq");
+        }
         userValidatorUpdate.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", user);

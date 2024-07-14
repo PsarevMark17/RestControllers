@@ -22,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @NonNull
     @Query(value = "from User u left join fetch u.authorities")
     List<User> findAll();
+
+    @Query(value = "select u.password from User u where u.id = :id")
+    Optional<String> getPasswordById(Long id);
 }

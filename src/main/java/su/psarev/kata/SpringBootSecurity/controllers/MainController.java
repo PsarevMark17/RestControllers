@@ -67,6 +67,8 @@ public class MainController {
         if (bindingResult.hasErrors()) {
             List<User> users = userServiceImpl.findAll();
             model.addAttribute("users", users);
+            //noinspection InstantiationOfUtilityClass
+            model.addAttribute("Util", new Util());
             model.addAttribute("users_roles", users.stream().map(user -> Util.setToString(user.getAuthorities())).collect(Collectors.toList()));
             model.addAttribute("newUser", newUser);
             model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));

@@ -55,7 +55,7 @@
                     <td th:text="${user.name}"></td>
                     <td th:text="${user.patronymic}"></td>
                     <td th:text="${user.birthDate}"></td>
-                    <td th:text="${users_roles[user.id - 1]}"></td>
+                    <td th:text="${Util.setToString(user.getAuthorities())}"></td>
                     <td>
                         <button th:onclick="|location.href='@{/admin/update(id=${user.id})}'|" type="button">Обновить
                         </button>

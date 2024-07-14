@@ -54,7 +54,7 @@ public class MainController {
     public String getAdmin(Model model) {
         List<User> users = userServiceImpl.findAll();
         model.addAttribute("users", users);
-        model.addAttribute("users_roles", users.stream().map(user -> Util.setToString(user.getAuthorities())).collect(Collectors.toList()));
+        model.addAttribute("Util", new Util());
         model.addAttribute("newUser", new User());
         model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
         return "admin";

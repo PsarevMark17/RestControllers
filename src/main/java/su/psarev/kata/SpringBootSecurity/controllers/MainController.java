@@ -1,7 +1,6 @@
 package su.psarev.kata.SpringBootSecurity.controllers;
 
 import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +42,6 @@ public class MainController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/user")
     public String getUser(Model model) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -52,7 +50,6 @@ public class MainController {
         return "user";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     public String getAdmin(Model model) {
         List<User> users = userServiceImpl.findAll();
@@ -63,7 +60,6 @@ public class MainController {
         return "admin";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin")
     public String postAdmin(@ModelAttribute("newUser") @Valid User newUser, BindingResult bindingResult, Model model) {
         userValidatorCreate.validate(newUser, bindingResult);
@@ -79,14 +75,12 @@ public class MainController {
         return "redirect:/admin";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/delete")
     public String delete(@ModelAttribute("deleteId") Long deleteId) {
         userServiceImpl.deleteUserById(deleteId);
         return "redirect:/admin";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/update")
     public String update(@RequestParam("id") Long id, Model model) {
         User user = userServiceImpl.loadUserById(id);
@@ -95,7 +89,6 @@ public class MainController {
         return "update";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/update")
     public String update(@RequestParam("id") Long id, @ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
         userValidatorUpdate.validate(user, bindingResult);

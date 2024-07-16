@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import su.psarev.kata.SpringBootSecurity.entities.Role;
 import su.psarev.kata.SpringBootSecurity.entities.User;
-import su.psarev.kata.SpringBootSecurity.services.UserServiceImpl;
+import su.psarev.kata.SpringBootSecurity.services.UserService;
 import su.psarev.kata.SpringBootSecurity.utils.UserValidatorCreate;
 import su.psarev.kata.SpringBootSecurity.utils.UserValidatorUpdate;
 import su.psarev.kata.SpringBootSecurity.utils.Util;
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
     private final UserValidatorCreate userValidatorCreate;
     private final UserValidatorUpdate userValidatorUpdate;
 
-    public MainController(UserServiceImpl userServiceImpl, UserValidatorCreate userValidatorCreate, UserValidatorUpdate userValidatorUpdate) {
-        this.userServiceImpl = userServiceImpl;
+    public MainController(UserService userService, UserValidatorCreate userValidatorCreate, UserValidatorUpdate userValidatorUpdate) {
+        this.userService = userService;
         this.userValidatorCreate = userValidatorCreate;
         this.userValidatorUpdate = userValidatorUpdate;
     }
@@ -52,7 +52,7 @@ public class MainController {
 
     @GetMapping("/admin")
     public String getAdmin(Model model) {
-        List<User> users = userServiceImpl.findAll();
+        List<User> users = userService.findAll();
         model.addAttribute("users", users);
         //noinspection InstantiationOfUtilityClass
         model.addAttribute("Util", new Util());
@@ -65,7 +65,7 @@ public class MainController {
     public String postAdmin(@ModelAttribute("newUser") @Valid User newUser, BindingResult bindingResult, Model model) {
         userValidatorCreate.validate(newUser, bindingResult);
         if (bindingResult.hasErrors()) {
-            List<User> users = userServiceImpl.findAll();
+            List<User> users = userService.findAll();
             model.addAttribute("users", users);
             //noinspection InstantiationOfUtilityClass
             model.addAttribute("Util", new Util());
@@ -74,19 +74,19 @@ public class MainController {
             model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
             return "admin";
         }
-        userServiceImpl.save(newUser);
+        userService.save(newUser);
         return "redirect:/admin";
     }
 
     @PostMapping("/admin/delete")
     public String delete(@ModelAttribute("deleteId") Long deleteId) {
-        userServiceImpl.deleteUserById(deleteId);
+        userService.deleteUserById(deleteId);
         return "redirect:/admin";
     }
 
     @GetMapping("/admin/update")
     public String update(@RequestParam("id") Long id, Model model) {
-        User user = userServiceImpl.loadUserById(id);
+        User user = userService.loadUserById(id);
         model.addAttribute("user", user);
         model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
         return "update";
@@ -103,7 +103,7 @@ public class MainController {
             model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
             return "update";
         }
-        userServiceImpl.updateUserById(id, user);
+        userService.updateUserById(id, user);
         return "redirect:/admin";
     }
 }

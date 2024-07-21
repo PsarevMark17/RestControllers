@@ -16,9 +16,7 @@ import su.psarev.kata.SpringBootSecurity.utils.UserValidatorCreate;
 import su.psarev.kata.SpringBootSecurity.utils.UserValidatorUpdate;
 import su.psarev.kata.SpringBootSecurity.utils.Util;
 
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
@@ -33,77 +31,58 @@ public class MainController {
     }
 
     @GetMapping("/")
-    public String getIndex() {
-        try {
-            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            return user.getAuthorities().contains(Role.ADMIN) ? "redirect:/admin" : user.getAuthorities().contains(Role.USER) ? "redirect:/user" : "redirect:/error";
-        } catch (ClassCastException e) {
-            return "index";
-        }
-    }
-
-    @GetMapping("/user")
-    public String getUser(Model model) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        model.addAttribute("user", user);
-        model.addAttribute("roles", Util.setToString(user.getAuthorities()));
-        return "user";
-    }
-
-    @GetMapping("/admin")
     public String getAdmin(Model model) {
-        List<User> users = userService.findAll();
-        model.addAttribute("users", users);
-        //noinspection InstantiationOfUtilityClass
-        model.addAttribute("Util", new Util());
+        model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         model.addAttribute("newUser", new User());
-        model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
+        model.addAttribute("updUser", new User());
+        addDefaultAttributes(model);
         return "admin";
     }
 
-    @PostMapping("/admin")
+    @PostMapping("/admin/create")
     public String postAdmin(@ModelAttribute("newUser") @Valid User newUser, BindingResult bindingResult, Model model) {
         userValidatorCreate.validate(newUser, bindingResult);
         if (bindingResult.hasErrors()) {
-            List<User> users = userService.findAll();
-            model.addAttribute("users", users);
-            //noinspection InstantiationOfUtilityClass
-            model.addAttribute("Util", new Util());
-            model.addAttribute("users_roles", users.stream().map(user -> Util.setToString(user.getAuthorities())).collect(Collectors.toList()));
+            model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
             model.addAttribute("newUser", newUser);
-            model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
+            model.addAttribute("updUser", new User());
+            addDefaultAttributes(model);
             return "admin";
         }
         userService.save(newUser);
-        return "redirect:/admin";
+        return "redirect:/";
     }
 
     @PostMapping("/admin/delete")
     public String delete(@ModelAttribute("deleteId") Long deleteId) {
         userService.deleteUserById(deleteId);
-        return "redirect:/admin";
-    }
-
-    @GetMapping("/admin/update")
-    public String update(@RequestParam("id") Long id, Model model) {
-        User user = userService.loadUserById(id);
-        model.addAttribute("user", user);
-        model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
-        return "update";
+        return "redirect:/";
     }
 
     @PostMapping("/admin/update")
-    public String update(@RequestParam("id") Long id, @ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
-        if (user.getPassword().isEmpty()) {
-            user.setPassword("Z5F7VnqXxNgeBtdkWsX8sm9bhBmVC9ryH2Pd3y8uQDGyWJtTd3VjfGqT57aKsdkZJXGBCBuXBCRuxVk79wA3MRXJCsfTqDAxTMHdtrxv5NfMss6ft34R8DQJK82YDND5GmV3fPYyVRxUntJQ6ewk4cFW7Ew5dnxnmpHcEjz9tf3x59vJrx9mas6S8YJ5B2TBgNwDpwSzzMesRy2baaZ5pwMp65Sg3Nk7Ttjw8nFJMWsHw5bY9bkwMfBmdWtdzmbq");
+    public String update(@RequestParam("id") Long id, @ModelAttribute("updUser") User updUser, BindingResult bindingResult, Model model) {
+        if (updUser.getPassword().isEmpty()) {
+            updUser.setPassword("Z5F7VnqXxNgeBtdkWsX8sm9bhBmVC9ryH2Pd3y8uQDGyWJtTd3VjfGqT57aKsdkZJXGBCBuXBCRuxVk79wA3MRXJCsfTqDAxTMHdtrxv5NfMss6ft34R8DQJK82YDND5GmV3fPYyVRxUntJQ6ewk4cFW7Ew5dnxnmpHcEjz9tf3x59vJrx9mas6S8YJ5B2TBgNwDpwSzzMesRy2baaZ5pwMp65Sg3Nk7Ttjw8nFJMWsHw5bY9bkwMfBmdWtdzmbq");
         }
-        userValidatorUpdate.validate(user, bindingResult);
+        userValidatorUpdate.validate(updUser, bindingResult);
         if (bindingResult.hasErrors()) {
-            model.addAttribute("user", user);
-            model.addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
-            return "update";
+            model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            model.addAttribute("newUser", new User());
+            model.addAttribute("updUser", updUser);
+            addDefaultAttributes(model);
+            return "admin";
         }
-        userService.updateUserById(id, user);
-        return "redirect:/admin";
+        userService.updateUserById(id, updUser);
+        return "redirect:/";
+    }
+
+    public void addDefaultAttributes(Model model) {
+        //noinspection InstantiationOfUtilityClass
+        model
+                .addAttribute("users", userService.findAll())
+                .addAttribute("Util", new Util())
+                .addAttribute("ROLE_ADMIN", Role.ADMIN)
+                .addAttribute("ROLE_USER", Role.USER)
+                .addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
     }
 }

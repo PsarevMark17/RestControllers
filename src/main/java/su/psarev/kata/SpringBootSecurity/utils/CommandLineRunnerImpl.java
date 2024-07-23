@@ -20,9 +20,9 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (!userService.findAll().stream().flatMap(user -> user.getAuthorities().stream()).collect(Collectors.toSet()).contains(Role.ADMIN)) {
-            userService.findByUsername("admin@mail.su").ifPresent(admin -> userService.deleteUserById(admin.getId()));
-            userService.save(
+        if (!userService.readAllUsers().stream().flatMap(user -> user.getAuthorities().stream()).collect(Collectors.toSet()).contains(Role.ADMIN)) {
+            userService.readUserByUsername("admin@mail.su").ifPresent(admin -> userService.deleteUserById(admin.getId()));
+            userService.createUser(
                     new User("admin@mail.su",
                             "Admin123",
                             "Админов",
@@ -31,9 +31,9 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
                             LocalDate.of(1970, 1, 1),
                             Set.of(Role.ADMIN)));
         }
-        if (!userService.findAll().stream().flatMap(user -> user.getAuthorities().stream()).collect(Collectors.toSet()).contains(Role.USER)) {
-            userService.findByUsername("user@mail.su").ifPresent(user -> userService.deleteUserById(user.getId()));
-            userService.save(
+        if (!userService.readAllUsers().stream().flatMap(user -> user.getAuthorities().stream()).collect(Collectors.toSet()).contains(Role.USER)) {
+            userService.readUserByUsername("user@mail.su").ifPresent(user -> userService.deleteUserById(user.getId()));
+            userService.createUser(
                     new User("user@mail.su",
                             "User1234",
                             "Пользователев",

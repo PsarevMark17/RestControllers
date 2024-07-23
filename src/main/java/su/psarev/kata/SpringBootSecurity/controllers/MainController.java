@@ -8,13 +8,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import su.psarev.kata.SpringBootSecurity.entities.Role;
 import su.psarev.kata.SpringBootSecurity.entities.User;
 import su.psarev.kata.SpringBootSecurity.services.UserService;
 import su.psarev.kata.SpringBootSecurity.utils.UserValidatorCreate;
 import su.psarev.kata.SpringBootSecurity.utils.UserValidatorUpdate;
-import su.psarev.kata.SpringBootSecurity.utils.Util;
 
 import java.util.Set;
 
@@ -32,10 +30,7 @@ public class MainController {
 
     @GetMapping("/")
     public String getAdmin(Model model) {
-        model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        model.addAttribute("newUser", new User());
-        model.addAttribute("updUser", new User());
-        addDefaultAttributes(model);
+        addDefaultAttributes(model, new User(), new User());
         return "admin";
     }
 
@@ -43,13 +38,10 @@ public class MainController {
     public String postAdmin(@ModelAttribute("newUser") @Valid User newUser, BindingResult bindingResult, Model model) {
         userValidatorCreate.validate(newUser, bindingResult);
         if (bindingResult.hasErrors()) {
-            model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-            model.addAttribute("newUser", newUser);
-            model.addAttribute("updUser", new User());
-            addDefaultAttributes(model);
+            addDefaultAttributes(model, newUser, new User());
             return "admin";
         }
-        userService.save(newUser);
+        userService.createUser(newUser);
         return "redirect:/";
     }
 
@@ -60,29 +52,24 @@ public class MainController {
     }
 
     @PostMapping("/admin/update")
-    public String update(@RequestParam("id") Long id, @ModelAttribute("updUser") User updUser, BindingResult bindingResult, Model model) {
-        if (updUser.getPassword().isEmpty()) {
-            updUser.setPassword("Z5F7VnqXxNgeBtdkWsX8sm9bhBmVC9ryH2Pd3y8uQDGyWJtTd3VjfGqT57aKsdkZJXGBCBuXBCRuxVk79wA3MRXJCsfTqDAxTMHdtrxv5NfMss6ft34R8DQJK82YDND5GmV3fPYyVRxUntJQ6ewk4cFW7Ew5dnxnmpHcEjz9tf3x59vJrx9mas6S8YJ5B2TBgNwDpwSzzMesRy2baaZ5pwMp65Sg3Nk7Ttjw8nFJMWsHw5bY9bkwMfBmdWtdzmbq");
-        }
+    public String update(@ModelAttribute("updUser") User updUser, BindingResult bindingResult, Model model) {
         userValidatorUpdate.validate(updUser, bindingResult);
         if (bindingResult.hasErrors()) {
-            model.addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-            model.addAttribute("newUser", new User());
-            model.addAttribute("updUser", updUser);
-            addDefaultAttributes(model);
+            addDefaultAttributes(model, new User(), updUser);
             return "admin";
         }
-        userService.updateUserById(id, updUser);
+        userService.updateUser(updUser);
         return "redirect:/";
     }
 
-    public void addDefaultAttributes(Model model) {
-        //noinspection InstantiationOfUtilityClass
+    public void addDefaultAttributes(Model model, User newUser, User updUser) {
         model
-                .addAttribute("users", userService.findAll())
-                .addAttribute("Util", new Util())
+                .addAttribute("user", SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .addAttribute("users", userService.readAllUsers())
                 .addAttribute("ROLE_ADMIN", Role.ADMIN)
                 .addAttribute("ROLE_USER", Role.USER)
-                .addAttribute("roles", Set.of(Role.ADMIN, Role.USER));
+                .addAttribute("roles", Set.of(Role.ADMIN, Role.USER))
+                .addAttribute("newUser", newUser)
+                .addAttribute("updUser", updUser);
     }
 }

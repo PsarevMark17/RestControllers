@@ -29,13 +29,16 @@ public class UserValidatorUpdate implements Validator {
     @Override
     public void validate(@NonNull Object target, @NonNull Errors errors) {
         User user = (User) target;
+        if (user.getPassword().isEmpty()) {
+            user.setPassword("Z5F7VnqXxNgeBtdkWsX8sm9bhBmVC9ryH2Pd3y8uQDGyWJtTd3VjfGqT57aKsdkZJXGBCBuXBCRuxVk79wA3MRXJCsfTqDAxTMHdtrxv5NfMss6ft34R8DQJK82YDND5GmV3fPYyVRxUntJQ6ewk4cFW7Ew5dnxnmpHcEjz9tf3x59vJrx9mas6S8YJ5B2TBgNwDpwSzzMesRy2baaZ5pwMp65Sg3Nk7Ttjw8nFJMWsHw5bY9bkwMfBmdWtdzmbq");
+        }
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
             Set<ConstraintViolation<User>> violations = validatorFactory.getValidator().validate(user);
             if (!violations.isEmpty()) {
                 violations.forEach(error -> errors.rejectValue(error.getPropertyPath().toString(),"", error.getMessage()));
             }
         }
-        Optional<User> probablyUser = userServiceImpl.findByUsername(user.getUsername());
+        Optional<User> probablyUser = userServiceImpl.readUserByUsername(user.getUsername());
         if (probablyUser.isPresent()) {
             if (!probablyUser.get().getId().equals(user.getId())) {
                 errors.rejectValue("username", "", "Пользователь с таким адресом электронной почты уже существует");

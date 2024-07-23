@@ -14,7 +14,7 @@
 <nav class="fixed-top navbar navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand"><b th:text="${user.username}"/> с ролями: <span
-                th:text="${Util.setToString(user.authorities)}"/></a>
+                th:each="authority : ${user.authorities}" th:text="${authority + ' '}"/></a>
         <form method="post" action="/logout">
             <input name="_csrf" type="hidden" th:value="${_csrf.token}"/>
             <span class="navbar-text"><input
@@ -81,7 +81,12 @@
                                         <td th:text="${user.name}"></td>
                                         <td th:text="${user.patronymic}"></td>
                                         <td th:text="${user.birthDate}"></td>
-                                        <td th:text="${Util.setToString(user.getAuthorities())}"></td>
+                                        <td>
+                                            <th:block>
+                                                <a th:each="authority : ${user.authorities}"
+                                                   th:text="${authority + ' '}"></a>
+                                            </th:block>
+                                        </td>
                                         <td>
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                                     th:data-bs-target="'#updateModal' + ${user.id}">
@@ -212,7 +217,7 @@
                                                                         <option th:each="role : ${roles}"
                                                                                 th:text="${role.name}"
                                                                                 th:value="${role.name}"
-                                                                                th:field="*{authorities}"/>
+                                                                                th:selected="${user.getAuthorities().contains(role)}"/>
                                                                     </select>
                                                                 </label>
                                                             </form>
@@ -287,7 +292,8 @@
                                                             <br>
                                                             <label class="mx-auto">
                                                                 <b>Дата рождения</b>
-                                                                <input class="form-control" th:value="${user.getBirthDate()}" disabled>
+                                                                <input class="form-control"
+                                                                       th:value="${user.getBirthDate()}" disabled>
                                                             </label>
                                                             <br>
                                                             <br>
@@ -439,7 +445,11 @@
                             <td th:text="${user.name}"/>
                             <td th:text="${user.patronymic}"/>
                             <td th:text="${user.birthDate}"/>
-                            <td th:text="${Util.setToString(user.authorities)}"/>
+                            <td>
+                                <th:block>
+                                    <a th:each="authority : ${user.authorities}" th:text="${authority + ' '}"></a>
+                                </th:block>
+                            </td>
                         </tr>
                         </tbody>
                     </table>

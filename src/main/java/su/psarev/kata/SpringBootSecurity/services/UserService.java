@@ -1,23 +1,20 @@
 package su.psarev.kata.SpringBootSecurity.services;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import su.psarev.kata.SpringBootSecurity.entities.User;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    void save(User user);
+    void createUser(User user);
 
-    List<User> findAll();
+    List<User> readAllUsers();
 
-    User loadUserById(Long id);
+    User readUserById(Long id);
 
-    UserDetails loadUserByUsername(String username);
+    Optional<User> readUserByUsername(String username);
 
-    Optional<User> findByUsername(String username);
-
-    void updateUserById(Long id, User user);
+    void updateUser(User user);
 
     void deleteUserById(Long id);
 }

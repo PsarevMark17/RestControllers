@@ -37,16 +37,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public User readUserById(Long id) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findUserById(id);
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("Пользователь не найден");
-        }
-        return user.get();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findUserByUsername(username);
         if (user.isEmpty()) {

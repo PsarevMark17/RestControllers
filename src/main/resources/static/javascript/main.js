@@ -73,6 +73,7 @@ async function handleEditForm(event) {
     let userMap = mapFromTarget(event.target)
     let response = await editUser(userMap)
     if (response.ok) {
+        editRow(userMap)
         document.getElementById("Edit").removeEventListener("submit", handleEditForm)
         closeOneModal("editModal")
         clearForm()

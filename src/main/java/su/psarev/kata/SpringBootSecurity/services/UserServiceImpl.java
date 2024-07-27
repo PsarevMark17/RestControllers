@@ -24,9 +24,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
-    public void createUser(User user) {
+    public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findUserByUsername(username);
+    public User readUserById(Long id) {
+        Optional<User> user = userRepository.findUserById(id);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("Пользователь не найден");
         }
@@ -49,6 +49,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional(readOnly = true)
     public Optional<User> readUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findUserByUsername(username);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("Пользователь не найден");
+        }
+        return user.get();
     }
 
     @Override

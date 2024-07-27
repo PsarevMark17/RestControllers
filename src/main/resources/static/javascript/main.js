@@ -73,10 +73,9 @@ async function handleEditForm(event) {
     let userMap = mapFromTarget(event.target)
     let response = await editUser(userMap)
     if (response.ok) {
-        fillHTML(["username", "password", "surname", "name", "patronymic", "birthDate"], "EditUserErrors", "", "<br>")
-        editRow(userMap)
         document.getElementById("Edit").removeEventListener("submit", handleEditForm)
         closeOneModal("editModal")
+        clearForm()
     } else {
         let errors = await response.json()
         fillHTML(["username", "password", "surname", "name", "patronymic", "birthDate"], "EditUserErrors", errors, "<br>")

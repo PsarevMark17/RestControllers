@@ -12,6 +12,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+    private final SuccessUserHandler successUserHandler;
+
+    public WebSecurityConfig(SuccessUserHandler successUserHandler) {
+        this.successUserHandler = successUserHandler;
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -21,7 +26,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
-                .formLogin(fL -> fL.defaultSuccessUrl("/").permitAll())
+                .formLogin(fL -> fL.successHandler(successUserHandler).permitAll())
                 .logout(LogoutConfigurer::permitAll)
                 .build();
     }

@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import su.psarev.kata.SpringBootSecurity.entities.User;
-import su.psarev.kata.SpringBootSecurity.services.UserServiceImpl;
+import su.psarev.kata.SpringBootSecurity.services.UserService;
 
 import java.util.Optional;
 import java.util.Set;
 
 @Component
 public class UserValidatorUpdate implements Validator {
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
-    public UserValidatorUpdate(UserServiceImpl userServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
+    public UserValidatorUpdate(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class UserValidatorUpdate implements Validator {
                 violations.forEach(error -> errors.rejectValue(error.getPropertyPath().toString(),"", error.getMessage()));
             }
         }
-        Optional<User> probablyUser = userServiceImpl.readUserByUsername(user.getUsername());
+        Optional<User> probablyUser = userService.readUserByUsername(user.getUsername());
         if (probablyUser.isPresent()) {
             if (!probablyUser.get().getId().equals(user.getId())) {
                 errors.rejectValue("username", "", "Пользователь с таким адресом электронной почты уже существует");

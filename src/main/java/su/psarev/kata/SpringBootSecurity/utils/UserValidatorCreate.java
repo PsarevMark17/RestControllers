@@ -5,14 +5,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import su.psarev.kata.SpringBootSecurity.entities.User;
-import su.psarev.kata.SpringBootSecurity.services.UserServiceImpl;
+import su.psarev.kata.SpringBootSecurity.services.UserService;
 
 @Component
 public class UserValidatorCreate implements Validator {
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
-    public UserValidatorCreate(UserServiceImpl userServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
+    public UserValidatorCreate(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class UserValidatorCreate implements Validator {
 
     @Override
     public void validate(@NonNull Object target, @NonNull Errors errors) {
-        if (userServiceImpl.readUserByUsername(((User) target).getUsername()).isPresent()) {
+        if (userService.readUserByUsername(((User) target).getUsername()).isPresent()) {
             errors.rejectValue("username", "", "Пользователь с таким адресом электронной почты уже существует");
         }
     }
